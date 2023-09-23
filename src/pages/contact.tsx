@@ -2,8 +2,47 @@ import Header from "@/components/header";
 import { Facebook, Instagram, Linkedin, Twitter } from "../components/icons";
 import LensFlare from "@/components/lensFlare";
 import Star from "@/components/starIcons";
+import { useEffect, useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import axios from "axios";
+import ContactModal from "@/components/contactModal";
+
+type formType = {
+  email: string;
+  phone_number: string;
+  first_name: string;
+  message: string;
+};
 
 const Contact = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting, errors },
+  } = useForm<formType>();
+
+  const [contactModal, setContactModal] = useState(false);
+
+  const onSubmit: SubmitHandler<formType> = async (data) => {
+    try {
+      const res = await axios(
+        "https://backend.getlinked.ai/hackathon/contact-form",
+        {
+          method: "POST",
+          data,
+        }
+      );
+
+      setContactModal(true);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const err = error.response?.data;
+
+        console.log(err);
+      }
+    }
+  };
+
   return (
     <>
       <Header />
@@ -44,7 +83,10 @@ const Contact = () => {
             </div>
           </div>
 
-          <div className="w-[617px] max-w-full h-[611px] px-[30px] md:px-[92px] flex flex-col justify-center md:bg-white md:bg-opacity-[0.03] rounded-xl md:shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]">
+          <form
+            className="w-[617px] max-w-full h-[611px] px-[30px] md:px-[92px] flex flex-col justify-center md:bg-white md:bg-opacity-[0.03] rounded-xl md:shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <h5 className="text-xl font-semibold text-tertiary">
               Questions or need assistance? <br />
               Let us know about it
@@ -55,27 +97,69 @@ const Contact = () => {
             </span>
 
             <div className="mt-6 space-y-5 md:space-y-10 md:mt-9">
-              <input
-                type="text"
-                placeholder="First Name"
-                className="px-4 md:px-8 py-3 text-sm md:text-base md:py-3 bg-white bg-opacity-[0.03] outline-none border-white border rounded shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] w-full font-Montserat"
-              />
-              <input
-                placeholder="Mail"
-                type="email"
-                className="px-4 md:px-8 py-3 text-sm md:text-base md:py-3 bg-white bg-opacity-[0.03] outline-none border-white border rounded shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] w-full font-Montserat"
-              />
-              <textarea
-                placeholder="Message"
-                name=""
-                id=""
-                className="px-4 md:px-8 py-3 text-sm md:text-base md:py-3 h-[120px] resize-none bg-white bg-opacity-[0.03] outline-none border-white border rounded shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] w-full font-Montserat"
-              />
+              <div>
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  className="px-4 md:px-8 py-3 text-sm md:text-base md:py-3 bg-white bg-opacity-[0.03] outline-none border-white border rounded shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] w-full font-Montserat"
+                  id="first_name"
+                  {...register("first_name", {
+                    required: "First name is required!",
+                  })}
+                />
+                <p className="text-xs text-red-500">
+                  {errors.first_name?.message}
+                </p>
+              </div>
+
+              <div>
+                <input
+                  placeholder="Mail"
+                  type="email"
+                  id="email"
+                  className="px-4 md:px-8 py-3 text-sm md:text-base md:py-3 bg-white bg-opacity-[0.03] outline-none border-white border rounded shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] w-full font-Montserat"
+                  {...register("email", {
+                    required: "email is required!",
+                  })}
+                />
+                <p className="text-xs text-red-500">{errors.email?.message}</p>
+              </div>
+
+              <div>
+                <input
+                  placeholder="Phone number"
+                  type="tel"
+                  id="phone_number"
+                  className="px-4 md:px-8 py-3 text-sm md:text-base md:py-3 bg-white bg-opacity-[0.03] outline-none border-white border rounded shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] w-full font-Montserat"
+                  {...register("phone_number", {
+                    required: "phone_number is required!",
+                  })}
+                />
+                <p className="text-xs text-red-500">
+                  {errors.phone_number?.message}
+                </p>
+              </div>
+
+              <div>
+                <textarea
+                  placeholder="Message"
+                  id=""
+                  className="px-4 md:px-8 py-3 text-sm md:text-base md:py-3 h-[120px] resize-none bg-white bg-opacity-[0.03] outline-none border-white border rounded shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] w-full font-Montserat"
+                  {...register("message", {
+                    required: "Message body is required!",
+                  })}
+                />
+                <p className="text-xs text-red-500">
+                  {errors.message?.message}
+                </p>
+              </div>
               <div className="flex justify-center">
-                <button className="btn">Submit</button>
+                <button className="btn" disabled={isSubmitting}>
+                  {!isSubmitting ? "Submit" : "Please wait...."}
+                </button>
               </div>
             </div>
-          </div>
+          </form>
         </div>
 
         <div className="grid md:hidden place-content-center">
@@ -115,6 +199,12 @@ const Contact = () => {
       <span className="pointer-events-none  absolute right-[50px] bottom-20 md:-bottom-[250px]">
         <Star colour="white" />
       </span>
+
+      {/* SUCCESS MODAL */}
+      <ContactModal
+        contactModal={contactModal}
+        setContactModal={setContactModal}
+      />
     </>
   );
 };

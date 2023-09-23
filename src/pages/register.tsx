@@ -1,10 +1,72 @@
 import Header from "@/components/header";
-import { Facebook, Instagram, Linkedin, Twitter } from "../components/icons";
 import LensFlare from "@/components/lensFlare";
 import Star from "@/components/starIcons";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import axios from "axios";
+import SuccessModal from "@/components/successModal";
+
+type formType = {
+  team_name: string;
+  phone_number: string;
+  email: string;
+  group_size: number;
+  category: number;
+  project_topic: string;
+  privacy_poclicy_accepted: boolean;
+};
 
 const Register = () => {
+  const [successModal, setSuccessModal] = useState(false);
+  const [category, setCategory] = useState<{ id: number; name: string }[]>([]);
+  const [error, setError] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting, errors },
+  } = useForm<formType>();
+
+  useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+        const res = await axios(
+          "https://backend.getlinked.ai/hackathon/categories-list"
+        );
+
+        const data = await res.data;
+        setCategory(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchCategory();
+  }, []);
+
+  const onSubmit: SubmitHandler<formType> = async (data) => {
+    try {
+      const res = await axios(
+        "https://backend.getlinked.ai/hackathon/registration",
+        {
+          method: "POST",
+          data,
+        }
+      );
+
+      setSuccessModal(true);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const err = error.response?.data;
+        if (err?.email) {
+          setError(err.email[0]);
+        }
+        console.log(err);
+      }
+    }
+  };
+
   return (
     <>
       <Header />
@@ -19,7 +81,10 @@ const Register = () => {
             />
           </div>
 
-          <div className="w-[740px] max-w-full md:h-[740px] px-[30px] md:px-[52px] flex flex-col justify-center md:bg-white md:bg-opacity-[0.03] rounded-xl md:shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] font-Montserat">
+          <form
+            className="w-[740px] max-w-full md:h-[740px] px-[30px] md:px-[52px] flex flex-col justify-center md:bg-white md:bg-opacity-[0.03] rounded-xl md:shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] font-Montserat"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <h5 className="text-2xl md:text-[32px] absolute top-5 left-8 lg:static font-semibold font-Clash-Display text-tertiary">
               Register
             </h5>
@@ -52,45 +117,75 @@ const Register = () => {
               CREATE YOUR ACCOUNT
             </h4>
 
-            <div className="mt-6 space-y-7 md:space-y-10 md:mt-9">
-              <div className="flex flex-col gap-8 md:flex-row">
+            <div className="mt-6 space-y-4 md:space-y-10 md:mt-9">
+              <div className="flex flex-col gap-4 md:gap-8 md:flex-row">
                 <div className="flex-1">
-                  <label htmlFor="teamsName" className="mb-3 text-sm">
+                  <label htmlFor="team_name" className="mb-3 text-sm">
                     Team’s Name
                   </label>
                   <input
                     type="text"
                     placeholder="Enter the name of your group"
                     className="px-4 md:px-6 py-3 text-sm md:py-3 bg-white bg-opacity-[0.03] outline-none border-white border rounded shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] w-full font-Montserat"
+                    id="team_name"
+                    {...register("team_name", {
+                      required: "Team's name is required!",
+                    })}
                   />
+                  <p className="text-xs text-red-500">
+                    {errors.team_name?.message}
+                  </p>
                 </div>
                 <div className="flex-1">
-                  <label className="mb-3 text-sm">Phone</label>
+                  <label className="mb-3 text-sm" htmlFor="phone_number">
+                    Phone
+                  </label>
                   <input
-                    type="text"
+                    type="tel"
                     placeholder="Enter your phone number"
                     className="px-4 md:px-6 py-3 text-sm md:py-3 bg-white bg-opacity-[0.03] outline-none border-white border rounded shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] w-full font-Montserat"
+                    id="phone_number"
+                    {...register("phone_number", {
+                      required: "Phone number is required!",
+                    })}
                   />
+                  <p className="text-xs text-red-500">
+                    {errors.phone_number?.message}
+                  </p>
                 </div>
               </div>
-              <div className="flex flex-col gap-8 md:flex-row">
+              <div className="flex flex-col gap-4 md:gap-8 md:flex-row">
                 <div className="flex-1">
-                  <label className="mb-3 text-sm">Email</label>
+                  <label className="mb-3 text-sm" htmlFor="email">
+                    Email
+                  </label>
                   <input
                     type="email"
                     placeholder="Enter your email address"
                     className="px-4 md:px-6 py-3 text-sm md:py-3 bg-white bg-opacity-[0.03] outline-none border-white border rounded shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] w-full font-Montserat"
+                    id="email"
+                    {...register("email", { required: "email is required!" })}
                   />
+                  <p className="text-xs text-red-500">
+                    {errors.email?.message}
+                  </p>
                 </div>
                 <div className="flex-1">
-                  <label htmlFor="" className="mb-3 text-sm">
+                  <label htmlFor="project_topic" className="mb-3 text-sm">
                     Project Topic
                   </label>
                   <input
                     type="text"
                     placeholder="What is your group project topic"
                     className="px-4 md:px-6 py-3 text-sm md:py-3 bg-white bg-opacity-[0.03] outline-none border-white border rounded shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] w-full font-Montserat"
+                    id="project_topic"
+                    {...register("project_topic", {
+                      required: "project topic is required!",
+                    })}
                   />
+                  <p className="text-xs text-red-500">
+                    {errors.project_topic?.message}
+                  </p>
                 </div>
               </div>
               <div className="flex gap-8">
@@ -99,29 +194,59 @@ const Register = () => {
                     Category
                   </label>
                   <select
-                    name="category"
-                    id="category"
                     className="px-4 md:px-6 py-3 text-sm md:py-3 bg-white bg-opacity-[0.03] outline-none border-white border rounded shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] w-full font-Montserat"
+                    id="category"
+                    {...register("category", {
+                      required: "category is required!",
+                    })}
                   >
-                    <option value=""></option>
-                    <option value=""></option>
-                    <option value=""></option>
+                    <option value="" hidden>
+                      select your category
+                    </option>
+                    {category.map((cate) => (
+                      <option
+                        key={cate.id}
+                        value={cate.id}
+                        className="text-black"
+                      >
+                        {cate.name}
+                      </option>
+                    ))}
                   </select>
+                  <p className="text-xs text-red-500">
+                    {errors.category?.message}
+                  </p>
                 </div>
 
                 <div className="flex-1">
-                  <label htmlFor="groupSize" className="mb-3 text-sm">
+                  <label htmlFor="group_size" className="mb-3 text-sm">
                     Group Size
                   </label>
                   <select
-                    name="groupSize"
-                    id="groupSize"
                     className="px-4 md:px-6 py-3 text-sm md:py-3 bg-white bg-opacity-[0.03] outline-none border-white border rounded shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] w-full font-Montserat"
+                    id="group_size"
+                    {...register("group_size", {
+                      required: "group size is required!",
+                    })}
                   >
-                    <option value=""></option>
-                    <option value=""></option>
-                    <option value=""></option>
+                    <option value="" hidden>
+                      select
+                    </option>
+                    {Array(10)
+                      .fill(null)
+                      .map((_, index) => (
+                        <option
+                          key={index + 1}
+                          value={index + 1}
+                          className="text-black"
+                        >
+                          {index + 1}
+                        </option>
+                      ))}
                   </select>
+                  <p className="text-xs text-red-500">
+                    {errors.group_size?.message}
+                  </p>
                 </div>
               </div>
             </div>
@@ -131,18 +256,30 @@ const Register = () => {
                 Please review your registration details before submitting
               </span>
               <div className="flex gap-2">
-                <input type="checkbox" name="terms" id="terms" />
-                <label htmlFor="terms" className="text-xs">
+                <input
+                  type="checkbox"
+                  id="privacy_poclicy_accepted"
+                  {...register("privacy_poclicy_accepted", {
+                    required: "terms and conditions needs to be checked",
+                  })}
+                />
+                <label htmlFor="privacy_poclicy_accepted" className="text-xs">
                   I agreed with the event terms and conditions and privacy
                   policy
                 </label>
               </div>
+              <p className="mt-1 text-xs text-red-500">
+                {errors.privacy_poclicy_accepted?.message}
+              </p>
             </div>
 
-            <div className="flex justify-center">
-              <button className="!w-full btn">Register Now</button>
+            <div className="flex flex-col justify-center gap-2">
+              <button className="!w-full btn" disabled={isSubmitting}>
+                {!isSubmitting ? "Register Now" : "Please wait...."}
+              </button>
             </div>
-          </div>
+            <p className="mt-1 text-xs text-red-500">{error}</p>
+          </form>
         </div>
 
         <span className="pointer-events-none hidden md:block absolute scale-125 -right-[300px] -bottom-[200px]">
@@ -166,21 +303,10 @@ const Register = () => {
       </span>
 
       {/* SUCCESS MODAL */}
-      <div className="fixed inset-0 flex items-center justify-center bg-[rgba(21,4,40,0.93)]">
-        <div className="w-[700px] h-[664px] flex flex-col items-center justify-center">
-          <Image
-            src="/images/congratulation.png"
-            alt="bulb icon"
-            height={0}
-            width={0}
-            sizes="100vw"
-            className="absolute w-auto h-auto md:scale-150"
-          />
-          <h1 className="text-base font-medium md:text-[32px] text-center mt-7">
-            Congratulations <br /> you have successfully registered!
-          </h1>
-        </div>
-      </div>
+      <SuccessModal
+        successModal={successModal}
+        setSuccessModal={setSuccessModal}
+      />
     </>
   );
 };

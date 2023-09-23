@@ -20,3 +20,7 @@
 .btn {
   @apply bg-linear-radial w-[152px] md:w-[172px] h-[46px] md:h-[53px] rounded font-Montserat text-sm md:text-base font-medium;
 }
+
+html {
+  scroll-behavior: smooth;
+}

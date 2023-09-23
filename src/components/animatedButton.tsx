@@ -42,8 +42,8 @@ const AnimatedButton = ({ toggle }: { toggle: boolean }) => {
             y2="23"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="#903AFF" />
-            <stop offset="1" stop-color="#FF26B9" />
+            <stop stopColor="#903AFF" />
+            <stop offset="1" stopColor="#FF26B9" />
           </linearGradient>
         </defs>
       </svg>
