@@ -1,0 +1,22 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Unica+One&display=swap");
+
+@font-face {
+  font-family: "Clash Display";
+  src: url("/font/ClashDisplay-Variable.ttf");
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.padding {
+  @apply px-6 md:px-[40px] lg:px-[80px] min-[1400px]:px-[128px];
+}
+
+.padding-left {
+  @apply pl-6 md:pl-[40px] lg:pl-[80px] min-[1400px]:pl-[128px];
+}
+
+.btn {
+  @apply bg-linear-radial w-[152px] md:w-[172px] h-[46px] md:h-[53px] rounded font-Montserat text-sm md:text-base font-medium;
+}
