@@ -516,7 +516,10 @@ export default function Home() {
                 Below are our privacy & policy, which outline a lot of goodies.
                 it’s our aim to always take of our participant
               </span>
-              <div className="md:w-[569px] md:h-[608px] border w-[295px] h-[635px] ml-[28px] md:ml-0 flex items-center flex-col border-tertiary rounded-[1px] mt-[69px]">
+              <div
+                className="md:w-[569px] md:h-[608px] border w-[330px] h-[635px] px-5 flex items-center flex-col border-tertiary rounded-[1px] mt-[69px] bg-[rgba(217,217,217,0.03)
+"
+              >
                 <div className="md:mt-[59px] mt-[30px] w-full px-2 md:px-0 md:ml-[72px]">
                   <span className="block text-[14px] md:w-[425px] w-[264px] md:text-left text-center md:mt-[18px]  font-Montserat font-normal">
                     At getlinked tech Hackathon 1.0, we value your privacy and
@@ -558,7 +561,7 @@ export default function Home() {
                 height={0}
                 sizes="100vh"
                 alt=""
-                className="w-auto h-auto md:scale-150"
+                className="w-auto h-[400px] md:h-auto md:scale-150"
               />
             </div>
           </div>
